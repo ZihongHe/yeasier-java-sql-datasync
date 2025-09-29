@@ -48,7 +48,7 @@ public class UserController {
 
 
     /**
-     * 查询用户
+     * 查询用户，登录
      */
     @PostMapping("/query_user")
     public BaseResponse<UserVO> queryUser(@RequestBody UserQueryRequest userQueryRequest, HttpServletRequest request) {
@@ -66,6 +66,17 @@ public class UserController {
         // 查询用户
         UserVO userVO = userService.queryUser(userQueryRequest, request);
         return ResultUtils.success(userVO);
+    }
+    /**
+     * 获取当前登录用户
+     *
+     * @param request
+     * @return
+     */
+    @GetMapping("/get/login")
+    public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        return ResultUtils.success(userService.getLoginUserVO(user));
     }
 
 
