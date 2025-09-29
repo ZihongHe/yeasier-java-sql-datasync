@@ -1,0 +1,206 @@
+package com.smarttoys.service.impl;
+
+import static com.smarttoys.constant.UserConstant.USER_LOGIN_STATE;
+
+import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.smarttoys.common.ErrorCode;
+import com.smarttoys.constant.CommonConstant;
+import com.smarttoys.exception.BusinessException;
+import com.smarttoys.mapper.AgentMapper;
+import com.smarttoys.mapper.UserMapper;
+import com.smarttoys.model.dto.user.UserQueryRequest;
+import com.smarttoys.model.entity.Agent;
+import com.smarttoys.model.entity.User;
+import com.smarttoys.model.enums.UserRoleEnum;
+import com.smarttoys.model.vo.AgentVO;
+import com.smarttoys.model.vo.LoginUserVO;
+import com.smarttoys.model.vo.UserVO;
+import com.smarttoys.service.AgentService;
+import com.smarttoys.service.UserService;
+import com.smarttoys.utils.SqlUtils;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
+
+/**
+ * @author 明月
+ * @description 针对表【user(用户)】的数据库操作Service
+ * @createDate 2025-09-25 16:45:54
+ */
+@Service
+@Slf4j
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    /**
+     * 盐值，混淆密码
+     */
+    public static final String SALT = "yeasier";
+
+    @Resource
+    private UserMapper userMapper;
+    @Resource
+    private AgentMapper agentMapper;
+
+
+    @Override
+    public UserVO queryUser(UserQueryRequest userQueryRequest, HttpServletRequest request) {
+        // 校验
+        if (userQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        if (StringUtils.isAnyBlank(userQueryRequest.getUserAccount(), userQueryRequest.getUserPassword())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        // 加密
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userQueryRequest.getUserPassword()).getBytes());
+        // 查询用户是否存在
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userQueryRequest.getUserAccount());
+        queryWrapper.eq("userPassword", encryptPassword);
+        User user = this.baseMapper.selectOne(queryWrapper);
+        // 用户不存在
+        if (user == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_EXIST, "用户不存在");
+        }
+        // 关联用户和智能体信息
+        UserVO userVO = UserVO.objToVo(user);
+        QueryWrapper<Agent> queryWrapperAgent = new QueryWrapper<>();
+        queryWrapperAgent.eq("userId", user.getUserId());
+        List<Agent> agentList = agentMapper.selectList(queryWrapperAgent);
+        List<AgentVO> agentVOList = AgentVO.objListToVoList(agentList);
+        userVO.setAgents(agentVOList);
+        request.getSession().setAttribute(USER_LOGIN_STATE, userVO);
+        return userVO;
+    }
+
+    /**
+     * 获取当前登录用户
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        // 先判断是否已登录
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null || currentUser.getUserId() == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        long userId = currentUser.getUserId();
+        currentUser = this.getById(userId);
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        return currentUser;
+    }
+
+    /**
+     * 获取当前登录用户（允许未登录）
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public User getLoginUserPermitNull(HttpServletRequest request) {
+        // 先判断是否已登录
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null || currentUser.getUserId() == null) {
+            return null;
+        }
+        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        long userId = currentUser.getUserId();
+        return this.getById(userId);
+    }
+
+    /**
+     * 是否为管理员
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        // 仅管理员可查询
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) userObj;
+        return isAdmin(user);
+    }
+
+    @Override
+    public boolean isAdmin(User user) {
+        return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
+    }
+
+    /**
+     * 用户注销
+     *
+     * @param request
+     */
+    @Override
+    public boolean userLogout(HttpServletRequest request) {
+        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
+        }
+        // 移除登录态
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return true;
+    }
+
+    @Override
+    public LoginUserVO getLoginUserVO(User user) {
+        if (user == null) {
+            return null;
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        BeanUtils.copyProperties(user, loginUserVO);
+        return loginUserVO;
+    }
+
+    @Override
+    public UserVO getUserVO(User user) {
+        if (user == null) {
+            return null;
+        }
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return userVO;
+    }
+
+    @Override
+    public List<UserVO> getUserVO(List<User> userList) {
+        if (CollUtil.isEmpty(userList)) {
+            return new ArrayList<>();
+        }
+        return userList.stream().map(this::getUserVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest) {
+        if (userQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        Long userId = userQueryRequest.getUserId();
+        String userAccount = userQueryRequest.getUserAccount();
+        String userPassword = userQueryRequest.getUserPassword();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(userAccount != null && userId > 0, "userAccount", userAccount);
+        queryWrapper.eq(userPassword != null, "userPassword", userPassword);
+
+        return queryWrapper;
+    }
+}

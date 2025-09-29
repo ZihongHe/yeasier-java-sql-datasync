@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smarttoys.mapper.AgentMapper">
+
+    <resultMap id="BaseResultMap" type="com.smarttoys.model.entity.Agent">
+            <id property="agentId" column="agentId" />
+            <result property="agentName" column="agentName" />
+            <result property="agentProfile" column="agentProfile" />
+            <result property="agentWakeword" column="agentWakeword" />
+            <result property="agentMemory" column="agentMemory" />
+            <result property="agentPosition" column="agentPosition" />
+            <result property="agentAction" column="agentAction" />
+            <result property="userId" column="userId" />
+            <result property="sandboxId" column="sandboxId" />
+            <result property="onlineStatus" column="onlineStatus" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+            <result property="isDelete" column="isDelete" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        agentId,agentName,agentProfile,agentWakeword,agentMemory,agentPosition,
+        agentAction,userId,sandboxId,onlineStatus,createTime,
+        updateTime,isDelete
+    </sql>
+</mapper>

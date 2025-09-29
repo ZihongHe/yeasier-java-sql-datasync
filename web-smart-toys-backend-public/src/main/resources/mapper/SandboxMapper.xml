@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smarttoys.mapper.SandboxMapper">
+
+    <resultMap id="BaseResultMap" type="com.smarttoys.model.entity.Sandbox">
+            <id property="sandboxId" column="sandboxId" />
+            <result property="sandboxType" column="sandboxType" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+            <result property="isDelete" column="isDelete" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        sandboxId,sandboxType,createTime,updateTime,isDelete
+    </sql>
+</mapper>
