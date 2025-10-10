@@ -85,25 +85,25 @@ create index idx_unionId
 
 使用idea分别打开两个项目
 
-<img src="D:\接收文件\xwechat_files\wxid_kocwbcd6kck621_108f\temp\InputTemp\02feb521-d882-45a6-8a92-cbfbfa4259e5.png" alt="02feb521-d882-45a6-8a92-cbfbfa4259e5" style="zoom: 33%;" />
+<img src="./images/1.png" style="zoom: 50%;">
 
 
 
 加载依赖
 
-<img src="D:\接收文件\xwechat_files\wxid_kocwbcd6kck621_108f\temp\RWTemp\2025-10\c0da6ef7d91b759870903fa56a707075\e469d3958896df7e15549aa307c78c62.png" alt="e469d3958896df7e15549aa307c78c62" style="zoom: 33%;" />
+<img src="./images/2.png" style="zoom: 33%;">
 
 选择Java版本
 
-<img src="D:\接收文件\xwechat_files\wxid_kocwbcd6kck621_108f\temp\RWTemp\2025-10\c0da6ef7d91b759870903fa56a707075\302b7bee605f03339690c5eec6b869bb.png" alt="302b7bee605f03339690c5eec6b869bb" style="zoom:33%;" />
+<img src="./images/3.png" style="zoom: 33%;">
 
-<img src="D:\接收文件\xwechat_files\wxid_kocwbcd6kck621_108f\temp\RWTemp\2025-10\c0da6ef7d91b759870903fa56a707075\4184c2fc116a1e7cb01eb399c3abdc4e.png" alt="4184c2fc116a1e7cb01eb399c3abdc4e" style="zoom:33%;" />
+<img src="./images/4.png" style="zoom: 50%;">
 
 
 
 运行：点击MainApplication主类，点击箭头
 
-![d3b267d2f8ebc1978b628b79786df3c7](D:\接收文件\xwechat_files\wxid_kocwbcd6kck621_108f\temp\RWTemp\2025-10\c0da6ef7d91b759870903fa56a707075\d3b267d2f8ebc1978b628b79786df3c7.png)
+<img src="./images/5.png" style="zoom: 50%;">
 
 
 
@@ -115,7 +115,7 @@ create index idx_unionId
 
 启动项目后，访问(http://localhost:5001/api/doc.html#/home)
 
-![image-20251010155948457](C:\Users\46671\AppData\Roaming\Typora\typora-user-images\image-20251010155948457.png)
+<img src="./images/6.png" style="zoom: 50%;">
 
 
 
