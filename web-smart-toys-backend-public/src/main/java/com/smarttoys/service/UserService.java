@@ -71,7 +71,7 @@ public interface UserService extends IService<User> {
      *
      * @return
      */
-    LoginUserVO getLoginUserVO(User user);
+    UserVO getLoginUserVO(User user);
 
     /**
      * 获取脱敏的用户信息
@@ -97,4 +97,5 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
+    List<String> getAgentNames(Long userId);
 }

@@ -95,18 +95,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
-        if (currentUser == null || currentUser.getUserId() == null) {
+        UserVO currentUserVO = (UserVO) userObj;
+        if (currentUserVO == null || currentUserVO.getUserId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getUserId();
-        currentUser = this.getById(userId);
+        long userId = currentUserVO.getUserId();
+        User currentUser = this.getById(userId);
         if (currentUser == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         return currentUser;
     }
+
 
     /**
      * 获取当前登录用户（允许未登录）
@@ -162,13 +163,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public LoginUserVO getLoginUserVO(User user) {
+    public UserVO getLoginUserVO(User user) {
         if (user == null) {
             return null;
         }
-        LoginUserVO loginUserVO = new LoginUserVO();
-        BeanUtils.copyProperties(user, loginUserVO);
-        return loginUserVO;
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return userVO;
     }
 
     @Override
@@ -202,5 +203,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.eq(userPassword != null, "userPassword", userPassword);
 
         return queryWrapper;
+    }
+
+    @Override
+    public List<String> getAgentNames(Long userId) {
+        // 获取用户所有的智能体名称
+        QueryWrapper<Agent> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", userId);
+        List<Agent> agentList = agentMapper.selectList(queryWrapper);
+        return agentList.stream().map(Agent::getAgentName).collect(Collectors.toList());
     }
 }

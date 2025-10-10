@@ -1,5 +1,6 @@
 package com.smarttoys.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.smarttoys.annotation.AuthCheck;
 import com.smarttoys.common.BaseResponse;
@@ -19,6 +20,7 @@ import com.smarttoys.model.vo.LoginUserVO;
 import com.smarttoys.model.vo.UserVO;
 import com.smarttoys.service.UserService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -74,10 +76,49 @@ public class UserController {
      * @return
      */
     @GetMapping("/get/login")
-    public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
+    public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
         User user = userService.getLoginUser(request);
         return ResultUtils.success(userService.getLoginUserVO(user));
     }
 
+    /**
+     * 查询配额
+     */
+    @PostMapping("/query_balance")
+    public BaseResponse<BigDecimal> queryBalance(@RequestBody UserQueryRequest userQueryRequest) {
+        if (userQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userQueryRequest.getUserAccount());
+        User user = userService.getOne(queryWrapper);
+        ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
+        return ResultUtils.success(user.getUserBalance());
+    }
+
+    /**
+     * 获取当前登陆用户全部智能体的名字
+     *
+     */
+    @PostMapping("/get_agent")
+    public BaseResponse<List<String>> getAgent(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        List<String> agentNames = userService.getAgentNames(user.getUserId());
+        return ResultUtils.success(agentNames);
+    }
+    /**
+     * 用户注销
+     *
+     * @param request
+     * @return
+     */
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+        if (request == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean result = userService.userLogout(request);
+        return ResultUtils.success(result);
+    }
 
 }

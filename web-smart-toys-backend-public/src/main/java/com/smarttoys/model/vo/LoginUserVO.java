@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
@@ -55,11 +57,6 @@ public class LoginUserVO implements Serializable {
     private Long defaultAgentId;
 
     /**
-     * 创建的智能体
-     */
-    private List<AgentVO> agents;
-
-    /**
      * 创建时间
      */
     private Date createTime;
@@ -73,7 +70,5 @@ public class LoginUserVO implements Serializable {
      * 是否删除
      */
     private Integer isDelete;
-
-
     private static final long serialVersionUID = 1L;
 }
