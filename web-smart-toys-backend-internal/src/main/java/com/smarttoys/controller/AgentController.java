@@ -1,5 +1,6 @@
 package com.smarttoys.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.smarttoys.common.BaseResponse;
 import com.smarttoys.common.ErrorCode;
 import com.smarttoys.common.ResultUtils;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -40,8 +42,14 @@ public class AgentController {
         Agent agent = new Agent();
         BeanUtils.copyProperties(agentAddRequest, agent);
         agentService.validAgent(agent, true);
-        User loginUser = userService.getLoginUser(request);
-        agent.setUserId(loginUser.getUserId());
+        Long userId = agentAddRequest.getUserId();
+        // 如果userId为空
+        if (userId == null || userId <= 0) {
+            User loginUser = userService.getLoginUser(request);
+            agent.setUserId(loginUser.getUserId());
+        } else {
+            agent.setUserId(userId);
+        }
         boolean result = agentService.save(agent);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(agent.getAgentId());
@@ -74,13 +82,26 @@ public class AgentController {
      * 查询智能体所在沙盒
      */
     @PostMapping("/query_agent_sandbox")
-    public BaseResponse<Long> queryAgentSandbox(long agentId) {
-        if (agentId == 0) {
+    public BaseResponse<Long> queryAgentSandbox(@RequestBody AgentQueryRequest agentQueryRequest) {
+        if (agentQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
+        long agentId = agentQueryRequest.getAgentId();
         Agent oldAgent = agentService.getById(agentId);
         ThrowUtils.throwIf(oldAgent == null, ErrorCode.AGENT_NOT_EXIST,"智能体不存在");
         return ResultUtils.success(agentService.getAgentSandboxId(agentId));
+    }
+
+    /**
+     * 查询智能体
+     */
+    @PostMapping("/query_agent")
+    public BaseResponse<List<Agent>> queryAgent(@RequestBody AgentQueryRequest agentQueryRequest) {
+        if (agentQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        List<Agent> agentList = agentService.list(agentService.getQueryWrapper(agentQueryRequest));
+        return ResultUtils.success(agentList);
     }
 
 }

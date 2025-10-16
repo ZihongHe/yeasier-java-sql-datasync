@@ -1,10 +1,13 @@
 package com.smarttoys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.smarttoys.common.ErrorCode;
 import com.smarttoys.exception.BusinessException;
 import com.smarttoys.exception.ThrowUtils;
 import com.smarttoys.mapper.SandboxMapper;
+import com.smarttoys.model.dto.agent.AgentQueryRequest;
 import com.smarttoys.model.entity.Agent;
 import com.smarttoys.model.entity.Sandbox;
 import com.smarttoys.service.AgentService;
@@ -13,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
 * @author 明月
@@ -56,6 +60,32 @@ public class AgentServiceImpl extends ServiceImpl<AgentMapper, Agent>
         Agent agent = agentMapper.selectById(agentId);
         return agent.getSandboxId();
     }
+
+    @Override
+    public QueryWrapper<Agent> getQueryWrapper(AgentQueryRequest agentQueryRequest) {
+        QueryWrapper<Agent> queryWrapper = new QueryWrapper<>();
+        if (agentQueryRequest == null) {
+            return queryWrapper;
+        }
+        Long agentId = agentQueryRequest.getAgentId();
+        String agentName = agentQueryRequest.getAgentName();
+        Long userId = agentQueryRequest.getUserId();
+        Long sandboxId = agentQueryRequest.getSandboxId();
+        Integer onlineStatus = agentQueryRequest.getOnlineStatus();
+        Integer isDelete = agentQueryRequest.getIsDelete();
+
+        queryWrapper.eq(agentId != null && agentId > 0, "id", agentId);
+        queryWrapper.like(StringUtils.isNotBlank(agentName), "agentName", agentName);
+        queryWrapper.eq(userId != null && userId > 0, "userId", userId);
+        queryWrapper.eq(sandboxId != null && sandboxId > 0, "sandboxId", sandboxId);
+        queryWrapper.eq(onlineStatus != null, "onlineStatus", onlineStatus);
+        queryWrapper.eq("isDelete", 0);
+
+        return queryWrapper;
+    }
+
+
+
 }
 
 

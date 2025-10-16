@@ -20,7 +20,8 @@ public enum ErrorCode {
     SANDBOX_ALREADY_EXIST(100003, "沙盒已存在"),
     SANDBOX_NOT_EXIST(100004, "沙盒不存在"),
     AGENT_ALREADY_EXIST(100005, "智能体已存在"),
-    AGENT_NOT_EXIST(100006, "智能体不存在");
+    AGENT_NOT_EXIST(100006, "智能体不存在"),
+    EMAIL_ALREADY_EXIST(100007, "邮箱已存在");
 
 
     /**
