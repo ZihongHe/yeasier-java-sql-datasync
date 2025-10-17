@@ -7,6 +7,7 @@ import com.smarttoys.common.ResultUtils;
 import com.smarttoys.exception.BusinessException;
 import com.smarttoys.exception.ThrowUtils;
 import com.smarttoys.model.dto.agent.AgentAddRequest;
+import com.smarttoys.model.dto.agent.AgentDeleteRequest;
 import com.smarttoys.model.dto.agent.AgentQueryRequest;
 import com.smarttoys.model.dto.agent.AgentUpdateRequest;
 import com.smarttoys.model.entity.Agent;
@@ -33,7 +34,12 @@ public class AgentController {
     @Resource
     private UserService userService;
 
-
+    /**
+     * 新增智能体
+     * @param agentAddRequest
+     * @param request
+     * @return
+     */
     @PostMapping("/add_agent")
     public BaseResponse<Long> addAgent(@RequestBody AgentAddRequest agentAddRequest, HttpServletRequest request) {
         if (agentAddRequest == null) {
@@ -41,15 +47,10 @@ public class AgentController {
         }
         Agent agent = new Agent();
         BeanUtils.copyProperties(agentAddRequest, agent);
+
+        // 校验
         agentService.validAgent(agent, true);
-        Long userId = agentAddRequest.getUserId();
-        // 如果userId为空
-        if (userId == null || userId <= 0) {
-            User loginUser = userService.getLoginUser(request);
-            agent.setUserId(loginUser.getUserId());
-        } else {
-            agent.setUserId(userId);
-        }
+
         boolean result = agentService.save(agent);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(agent.getAgentId());
@@ -61,16 +62,19 @@ public class AgentController {
      * @param request
      * @return
      */
-    @PostMapping("/update_agent_virtual")
-    public BaseResponse<Long> updateAgentVirtual(@RequestBody AgentUpdateRequest agentUpdateRequest, HttpServletRequest request) {
+    @PostMapping("/update_agent")
+    public BaseResponse<Long> updateAgent(@RequestBody AgentUpdateRequest agentUpdateRequest, HttpServletRequest request) {
         if (agentUpdateRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         Agent agent = new Agent();
         BeanUtils.copyProperties(agentUpdateRequest, agent);
+
+        // 校验智能体是否存在
         long agentId = agentUpdateRequest.getAgentId();
         Agent oldAgent = agentService.getById(agentId);
         ThrowUtils.throwIf(oldAgent == null, ErrorCode.AGENT_NOT_EXIST,"智能体不存在");
+
         agentService.validAgent(agent, false);
         boolean result = agentService.updateById(agent);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -78,30 +82,51 @@ public class AgentController {
         return ResultUtils.success(agentId);
     }
 
+//    /**
+//     * 查询智能体所在沙盒
+//     */
+//    @PostMapping("/query_agent_sandbox")
+//    public BaseResponse<Long> queryAgentSandbox(@RequestBody AgentQueryRequest agentQueryRequest) {
+//        if (agentQueryRequest == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+//        }
+//        // 校验智能体是否存在
+//        long agentId = agentQueryRequest.getAgentId();
+//        Agent oldAgent = agentService.getById(agentId);
+//        ThrowUtils.throwIf(oldAgent == null, ErrorCode.AGENT_NOT_EXIST,"智能体不存在");
+//
+//        return ResultUtils.success(agentService.getAgentSandboxId(agentId));
+//    }
+
     /**
-     * 查询智能体所在沙盒
+     * 按条件查询智能体
      */
-    @PostMapping("/query_agent_sandbox")
-    public BaseResponse<Long> queryAgentSandbox(@RequestBody AgentQueryRequest agentQueryRequest) {
+    @PostMapping("/query_agent")
+    public BaseResponse<Page<Agent>> queryAgent(@RequestBody AgentQueryRequest agentQueryRequest) {
         if (agentQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
-        long agentId = agentQueryRequest.getAgentId();
-        Agent oldAgent = agentService.getById(agentId);
-        ThrowUtils.throwIf(oldAgent == null, ErrorCode.AGENT_NOT_EXIST,"智能体不存在");
-        return ResultUtils.success(agentService.getAgentSandboxId(agentId));
+        long current = agentQueryRequest.getCurrent();
+        long size = agentQueryRequest.getPageSize();
+        Page<Agent> agentPage = agentService.page(new Page<>(current, size), agentService.getQueryWrapper(agentQueryRequest));
+        return ResultUtils.success(agentPage);
     }
 
     /**
-     * 查询智能体
+     * 删除智能体
      */
-    @PostMapping("/query_agent")
-    public BaseResponse<List<Agent>> queryAgent(@RequestBody AgentQueryRequest agentQueryRequest) {
-        if (agentQueryRequest == null) {
+    @PostMapping("/delete_agent")
+    public BaseResponse<Boolean> deleteAgent(@RequestBody AgentDeleteRequest agentDeleteRequest) {
+        if (agentDeleteRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
-        List<Agent> agentList = agentService.list(agentService.getQueryWrapper(agentQueryRequest));
-        return ResultUtils.success(agentList);
+        // 校验智能体是否存在
+        long agentId = agentDeleteRequest.getAgentId();
+        Agent oldAgent = agentService.getById(agentId);
+        ThrowUtils.throwIf(oldAgent == null, ErrorCode.AGENT_NOT_EXIST,"智能体不存在");
+
+        boolean result = agentService.removeById(agentId);
+        return ResultUtils.success(result);
     }
 
 }

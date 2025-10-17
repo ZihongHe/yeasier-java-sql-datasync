@@ -6,10 +6,7 @@ import com.smarttoys.common.ErrorCode;
 import com.smarttoys.common.ResultUtils;
 import com.smarttoys.exception.BusinessException;
 import com.smarttoys.exception.ThrowUtils;
-import com.smarttoys.model.dto.user.UserAddRequest;
-import com.smarttoys.model.dto.user.UserQueryRequest;
-import com.smarttoys.model.dto.user.UserUpdateBalanceRequest;
-import com.smarttoys.model.dto.user.UserUpdateRequest;
+import com.smarttoys.model.dto.user.*;
 import com.smarttoys.model.entity.User;
 import com.smarttoys.model.vo.UserVO;
 import com.smarttoys.service.UserService;
@@ -59,8 +56,6 @@ public class UserController {
         return ResultUtils.success(userVO);
     }
 
-    // region 登录相关
-
     /**
      * 新增用户
      *
@@ -81,46 +76,69 @@ public class UserController {
      * 更新用户
      */
     @PostMapping("/update_user")
-    public BaseResponse<UserVO> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
+    public BaseResponse<Long> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         if (userUpdateRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
-        UserVO userVO = userService.updateUserByAccountPassword(userUpdateRequest);
-        return ResultUtils.success(userVO);
+        Long userId = userUpdateRequest.getUserId();
+        User user = userService.getById(userId);
+        ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
+        BeanUtils.copyProperties(userUpdateRequest, user);
+        boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(userId);
     }
 
     /**
-     * 更新配额
+     * 删除用户
      */
-    @PostMapping("/update_balance")
-    public BaseResponse<BigDecimal> updateBalance(@RequestBody UserUpdateBalanceRequest userUpdateBalanceRequest) {
-        if (userUpdateBalanceRequest == null) {
+    @PostMapping("/delete_user")
+    public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest) {
+        if (userDeleteRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userUpdateBalanceRequest.getUserAccount());
-        User user = userService.getOne(queryWrapper);
+        Long userId = userDeleteRequest.getUserId();
+        // 判断是否存在
+        User user = userService.getById(userId);
         ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
-        BigDecimal balanceQuota = user.getUserBalance().add(userUpdateBalanceRequest.getBalanceQuota());
-        user.setUserBalance(balanceQuota);
-        userService.updateById(user);
-        return ResultUtils.success(balanceQuota);
+
+        boolean result = userService.removeById(userId);
+        return ResultUtils.success(result);
     }
 
-    /**
-     * 查询配额
-     */
-    @PostMapping("/query_balance")
-    public BaseResponse<BigDecimal> queryBalance(@RequestBody UserQueryRequest userQueryRequest) {
-        if (userQueryRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
-        }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userQueryRequest.getUserAccount());
-        User user = userService.getOne(queryWrapper);
-        ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
-        return ResultUtils.success(user.getUserBalance());
-    }
+
+//    /**
+//     * 更新配额
+//     */
+//    @PostMapping("/update_balance")
+//    public BaseResponse<BigDecimal> updateBalance(@RequestBody UserUpdateBalanceRequest userUpdateBalanceRequest) {
+//        if (userUpdateBalanceRequest == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+//        }
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("userAccount", userUpdateBalanceRequest.getUserAccount());
+//        User user = userService.getOne(queryWrapper);
+//        ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
+//        BigDecimal balanceQuota = user.getUserBalance().add(userUpdateBalanceRequest.getBalanceQuota());
+//        user.setUserBalance(balanceQuota);
+//        userService.updateById(user);
+//        return ResultUtils.success(balanceQuota);
+//    }
+//
+//    /**
+//     * 查询配额
+//     */
+//    @PostMapping("/query_balance")
+//    public BaseResponse<BigDecimal> queryBalance(@RequestBody UserQueryRequest userQueryRequest) {
+//        if (userQueryRequest == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+//        }
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("userAccount", userQueryRequest.getUserAccount());
+//        User user = userService.getOne(queryWrapper);
+//        ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
+//        return ResultUtils.success(user.getUserBalance());
+//    }
 
 
 }

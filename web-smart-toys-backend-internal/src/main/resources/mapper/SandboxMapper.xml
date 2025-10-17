@@ -6,13 +6,16 @@
 
     <resultMap id="BaseResultMap" type="com.smarttoys.model.entity.Sandbox">
             <id property="sandboxId" column="sandboxId" />
+            <result property="sandboxName" column="sandboxName" />
             <result property="sandboxType" column="sandboxType" />
+            <result property="userId" column="userId" />
             <result property="createTime" column="createTime" />
             <result property="updateTime" column="updateTime" />
             <result property="isDelete" column="isDelete" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        sandboxId,sandboxType,createTime,updateTime,isDelete
+        sandboxId,sandboxName,sandboxType,userId,createTime,updateTime,
+        isDelete
     </sql>
 </mapper>

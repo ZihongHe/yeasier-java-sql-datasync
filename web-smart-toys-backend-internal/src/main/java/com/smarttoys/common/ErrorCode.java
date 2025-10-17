@@ -21,7 +21,20 @@ public enum ErrorCode {
     SANDBOX_NOT_EXIST(100004, "沙盒不存在"),
     AGENT_ALREADY_EXIST(100005, "智能体已存在"),
     AGENT_NOT_EXIST(100006, "智能体不存在"),
-    EMAIL_ALREADY_EXIST(100007, "邮箱已存在");
+    ACHIEVEMENT_ALREADY_EXIST(100007, "成就已存在"),
+    ACHIEVEMENT_NOT_EXIST(100008, "成就不存在"),
+
+    // 用户沙盒相关错误码 (根据你的描述补充)
+    USER_SANDBOX_ALREADY_EXIST(100009, "用户沙盒已存在"),
+    USER_SANDBOX_NOT_EXIST(100010, "用户沙盒不存在"),
+
+    // 用户智能体相关错误码 (根据你的描述补充)
+    USER_AGENT_ALREADY_EXIST(100011, "用户智能体已存在"),
+    USER_AGENT_NOT_EXIST(100012, "用户智能体不存在"),
+
+    // 用户成就相关错误码 (根据你的描述补充)
+    USER_ACHIEVEMENT_ALREADY_EXIST(100013, "用户成就已存在"),
+    USER_ACHIEVEMENT_NOT_EXIST(100014, "用户成就不存在");
 
 
     /**

@@ -5,8 +5,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.smarttoys.model.entity.User;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -52,15 +50,31 @@ public class UserVO implements Serializable {
      * 用户余额
      */
     private BigDecimal userBalance;
-    /*
-     * 默认agentId
-     */
-    private Long defaultAgentId;
 
     /**
      * 创建的智能体
      */
     private List<AgentVO> agents;
+
+    /**
+     * 关联的智能体
+     */
+    private List<UserAgentVO> userAgents;
+
+    /**
+     * 创建的沙盒
+     */
+    private List<SandboxVO> sandboxes;
+
+    /**
+     * 关联的沙盒
+     */
+    private List<UserSandboxVO> userSandboxes;
+
+    /**
+     * 获得的成就
+     */
+    private List<UserAchievementVO> userAchievements;
 
     /**
      * 创建时间

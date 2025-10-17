@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 public class AgentUpdateRequest implements Serializable {
@@ -44,6 +45,10 @@ public class AgentUpdateRequest implements Serializable {
      */
     private String agentAction;
 
+    /**
+     * 创建用户 id
+     */
+    private Long userId;
 
     /**
      * 所属沙盒 id
@@ -54,4 +59,10 @@ public class AgentUpdateRequest implements Serializable {
      * 在线状态：0-离线 1-在线
      */
     private Integer onlineStatus;
+
+
+    /**
+     * 是否删除
+     */
+    private Integer isDelete;
 }

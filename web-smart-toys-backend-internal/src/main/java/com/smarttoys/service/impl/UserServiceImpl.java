@@ -6,7 +6,6 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.smarttoys.common.ErrorCode;
-import com.smarttoys.constant.CommonConstant;
 import com.smarttoys.exception.BusinessException;
 import com.smarttoys.mapper.AgentMapper;
 import com.smarttoys.mapper.UserMapper;
@@ -20,7 +19,6 @@ import com.smarttoys.model.vo.AgentVO;
 import com.smarttoys.model.vo.LoginUserVO;
 import com.smarttoys.model.vo.UserVO;
 import com.smarttoys.service.UserService;
-import com.smarttoys.utils.SqlUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -76,7 +74,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
         }
         synchronized (userAccount.intern()) {
-            // 账户不能重复
             // 账号不能重复
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("userAccount", userAccount);
@@ -89,7 +86,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             queryWrapper.eq("userEmail", userEmail);
             count = this.baseMapper.selectCount(queryWrapper);
             if (count > 0) {
-                throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXIST, "邮箱重复");
+                throw new BusinessException(ErrorCode.USER_ALREADY_EXIST, "邮箱重复");
             }
             // 2. 加密
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
@@ -119,22 +116,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userQueryRequest.getUserPassword()).getBytes());
         // 查询用户是否存在
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userQueryRequest.getUserAccount());
-        queryWrapper.eq("userPassword", encryptPassword);
-        User user = this.baseMapper.selectOne(queryWrapper);
+        boolean isUserExist = false;
+
+        QueryWrapper<User> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("userAccount", userQueryRequest.getUserAccount());
+        queryWrapper1.eq("userPassword", encryptPassword);
+        User user = this.baseMapper.selectOne(queryWrapper1);
+        if (user == null) {
+            QueryWrapper<User> queryWrapper2 = new QueryWrapper<>();
+            queryWrapper2.eq("userEmail", userQueryRequest.getUserAccount());
+            queryWrapper2.eq("userPassword", encryptPassword);
+            user = this.baseMapper.selectOne(queryWrapper2);
+        }
+
         // 用户不存在
         if (user == null) {
-            throw new BusinessException(ErrorCode.USER_NOT_EXIST, "用户不存在");
+            throw new BusinessException(ErrorCode.USER_NOT_EXIST, "用户或密码错误");
         }
-        // 关联用户和智能体信息
         UserVO userVO = UserVO.objToVo(user);
-        QueryWrapper<Agent> queryWrapperAgent = new QueryWrapper<>();
-        queryWrapperAgent.eq("userId", user.getUserId());
-        List<Agent> agentList = agentMapper.selectList(queryWrapperAgent);
-        List<AgentVO> agentVOList = AgentVO.objListToVoList(agentList);
-        userVO.setAgents(agentVOList);
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+
+        // TODO 关联用户和智能体、沙盒等信息
+//        QueryWrapper<Agent> queryWrapperAgent = new QueryWrapper<>();
+//        queryWrapperAgent.eq("userId", user.getUserId());
+//        List<Agent> agentList = agentMapper.selectList(queryWrapperAgent);
+//        List<AgentVO> agentVOList = AgentVO.objListToVoList(agentList);
+//        userVO.setAgents(agentVOList);
+
+
+//        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        // TODO 保存登陆状态
         return userVO;
     }
 
@@ -190,19 +200,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return this.getById(userId);
     }
 
-    /**
-     * 是否为管理员
-     *
-     * @param request
-     * @return
-     */
-    @Override
-    public boolean isAdmin(HttpServletRequest request) {
-        // 仅管理员可查询
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
-        return isAdmin(user);
-    }
+
 
     @Override
     public boolean isAdmin(User user) {
@@ -260,11 +258,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Long userId = userQueryRequest.getUserId();
         String userAccount = userQueryRequest.getUserAccount();
         String userPassword = userQueryRequest.getUserPassword();
+        String userName = userQueryRequest.getUserName();
+        String userRole = userQueryRequest.getUserRole();
+        String userEmail = userQueryRequest.getUserEmail();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(userAccount != null , "userAccount", userAccount);
         queryWrapper.eq(userPassword != null, "userPassword", userPassword);
         queryWrapper.eq(userId != null, "userId", userId);
-
+        queryWrapper.eq(userName != null, "userName", userName);
+        queryWrapper.eq(userRole != null, "userRole", userRole);
+        queryWrapper.eq(userEmail != null, "userEmail", userEmail);
         return queryWrapper;
     }
 

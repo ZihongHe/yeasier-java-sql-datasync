@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smarttoys.mapper.UserAchievementMapper">
+
+    <resultMap id="BaseResultMap" type="com.smarttoys.model.entity.UserAchievement">
+            <id property="userAchievementId" column="userAchievementId" />
+            <result property="achievementId" column="achievementId" />
+            <result property="userId" column="userId" />
+            <result property="userRank" column="userRank" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+            <result property="isDelete" column="isDelete" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        userAchievementId,achievementId,userId,userRank,createTime,updateTime,
+        isDelete
+    </sql>
+</mapper>

@@ -5,7 +5,7 @@
 <mapper namespace="com.smarttoys.mapper.UserMapper">
 
     <resultMap id="BaseResultMap" type="com.smarttoys.model.entity.User">
-        <id property="userId" column="userId" />
+            <id property="userId" column="userId" />
             <result property="userAccount" column="userAccount" />
             <result property="userPassword" column="userPassword" />
             <result property="userName" column="userName" />
@@ -15,11 +15,11 @@
             <result property="createTime" column="createTime" />
             <result property="updateTime" column="updateTime" />
             <result property="isDelete" column="isDelete" />
-        <result property="defaultAgentId" column="agentList" />
+            <result property="defaultAgentId" column="defaultAgentId" />
     </resultMap>
 
     <sql id="Base_Column_List">
         userId,userAccount,userPassword,userName,userRole,userEmail,
-        userBalance,createTime,updateTime,isDelete
+        userBalance,createTime,updateTime,isDelete,defaultAgentId
     </sql>
 </mapper>

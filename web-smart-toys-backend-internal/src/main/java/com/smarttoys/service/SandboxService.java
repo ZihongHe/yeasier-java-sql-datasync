@@ -1,9 +1,10 @@
 package com.smarttoys.service;
 
-import com.smarttoys.common.BaseResponse;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.smarttoys.model.dto.sandbox.SandboxAddRequest;
-import com.smarttoys.model.entity.Sandbox;
+import com.smarttoys.model.dto.sandbox.SandboxQueryRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.smarttoys.model.entity.Sandbox;
 
 /**
 * @author 明月
@@ -19,4 +20,16 @@ public interface SandboxService extends IService<Sandbox> {
      * @return sandboxId
      */
     Long addSandbox(SandboxAddRequest sandboxAddRequest);
+
+    /**
+     * 获取查询包装类
+     *
+     */
+    QueryWrapper<Sandbox> getQueryWrapper(SandboxQueryRequest sandboxQueryRequest);
+
+    /**
+     * 校验
+     *
+     */
+    void validSandbox(SandboxAddRequest sandboxAddRequest, boolean add);
 }

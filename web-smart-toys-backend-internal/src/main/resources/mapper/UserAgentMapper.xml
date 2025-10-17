@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smarttoys.mapper.UserAgentMapper">
+
+    <resultMap id="BaseResultMap" type="com.smarttoys.model.entity.UserAgent">
+            <id property="userAgentId" column="userAgentId" />
+            <result property="userAgentName" column="userAgentName" />
+            <result property="userAgentProfile" column="userAgentProfile" />
+            <result property="userAgentWakeword" column="userAgentWakeword" />
+            <result property="userAgentMemory" column="userAgentMemory" />
+            <result property="userAgentPosition" column="userAgentPosition" />
+            <result property="userAgentAction" column="userAgentAction" />
+            <result property="userId" column="userId" />
+            <result property="agentId" column="agentId" />
+            <result property="sandboxId" column="sandboxId" />
+            <result property="onlineStatus" column="onlineStatus" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+            <result property="isDelete" column="isDelete" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        userAgentId,userAgentName,userAgentProfile,userAgentWakeword,userAgentMemory,userAgentPosition,
+        userAgentAction,userId,agentId,sandboxId,onlineStatus,
+        createTime,updateTime,isDelete
+    </sql>
+</mapper>

@@ -49,76 +49,76 @@ public class UserController {
     private UserService userService;
 
 
-    /**
-     * 查询用户，登录
-     */
-    @PostMapping("/query_user")
-    public BaseResponse<UserVO> queryUser(@RequestBody UserQueryRequest userQueryRequest, HttpServletRequest request) {
-        // 校验参数
-        if (userQueryRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
-        }
-        String userAccount = userQueryRequest.getUserAccount();
-        String userPassword = userQueryRequest.getUserPassword();
-
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
-        }
-
-        // 查询用户
-        UserVO userVO = userService.queryUser(userQueryRequest, request);
-        return ResultUtils.success(userVO);
-    }
-    /**
-     * 获取当前登录用户
-     *
-     * @param request
-     * @return
-     */
-    @GetMapping("/get/login")
-    public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
-        User user = userService.getLoginUser(request);
-        return ResultUtils.success(userService.getLoginUserVO(user));
-    }
-
-    /**
-     * 查询配额
-     */
-    @PostMapping("/query_balance")
-    public BaseResponse<BigDecimal> queryBalance(@RequestBody UserQueryRequest userQueryRequest) {
-        if (userQueryRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
-        }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userQueryRequest.getUserAccount());
-        User user = userService.getOne(queryWrapper);
-        ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
-        return ResultUtils.success(user.getUserBalance());
-    }
-
-    /**
-     * 获取当前登陆用户全部智能体的名字
-     *
-     */
-    @PostMapping("/get_agent")
-    public BaseResponse<List<String>> getAgent(HttpServletRequest request) {
-        User user = userService.getLoginUser(request);
-        List<String> agentNames = userService.getAgentNames(user.getUserId());
-        return ResultUtils.success(agentNames);
-    }
-    /**
-     * 用户注销
-     *
-     * @param request
-     * @return
-     */
-    @PostMapping("/logout")
-    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
-        if (request == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        boolean result = userService.userLogout(request);
-        return ResultUtils.success(result);
-    }
+//    /**
+//     * 查询用户，登录
+//     */
+//    @PostMapping("/query_user")
+//    public BaseResponse<UserVO> queryUser(@RequestBody UserQueryRequest userQueryRequest, HttpServletRequest request) {
+//        // 校验参数
+//        if (userQueryRequest == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+//        }
+//        String userAccount = userQueryRequest.getUserAccount();
+//        String userPassword = userQueryRequest.getUserPassword();
+//
+//        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+//        }
+//
+//        // 查询用户
+//        UserVO userVO = userService.queryUser(userQueryRequest, request);
+//        return ResultUtils.success(userVO);
+//    }
+//    /**
+//     * 获取当前登录用户
+//     *
+//     * @param request
+//     * @return
+//     */
+//    @GetMapping("/get/login")
+//    public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
+//        User user = userService.getLoginUser(request);
+//        return ResultUtils.success(userService.getLoginUserVO(user));
+//    }
+//
+//    /**
+//     * 查询配额
+//     */
+//    @PostMapping("/query_balance")
+//    public BaseResponse<BigDecimal> queryBalance(@RequestBody UserQueryRequest userQueryRequest) {
+//        if (userQueryRequest == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+//        }
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("userAccount", userQueryRequest.getUserAccount());
+//        User user = userService.getOne(queryWrapper);
+//        ThrowUtils.throwIf(user == null, ErrorCode.USER_NOT_EXIST, "用户不存在");
+//        return ResultUtils.success(user.getUserBalance());
+//    }
+//
+//    /**
+//     * 获取当前登陆用户全部智能体的名字
+//     *
+//     */
+//    @PostMapping("/get_agent")
+//    public BaseResponse<List<String>> getAgent(HttpServletRequest request) {
+//        User user = userService.getLoginUser(request);
+//        List<String> agentNames = userService.getAgentNames(user.getUserId());
+//        return ResultUtils.success(agentNames);
+//    }
+//    /**
+//     * 用户注销
+//     *
+//     * @param request
+//     * @return
+//     */
+//    @PostMapping("/logout")
+//    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+//        if (request == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//        }
+//        boolean result = userService.userLogout(request);
+//        return ResultUtils.success(result);
+//    }
 
 }

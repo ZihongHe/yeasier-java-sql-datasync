@@ -32,28 +32,10 @@ public class AgentVO implements Serializable {
     private String agentWakeword;
 
     /**
-     * 智能体记忆
-     */
-    private String agentMemory;
-
-    /**
-     * 智能体位置信息
-     */
-    private String agentPosition;
-
-    /**
-     * 智能体当前正在做的行为
-     */
-    private String agentAction;
-
-    /**
      * 创建用户 id
      */
     private Long userId;
-    /**
-     * 创建人信息
-     */
-    private UserVO user;
+
 
     /**
      * 所属沙盒 id

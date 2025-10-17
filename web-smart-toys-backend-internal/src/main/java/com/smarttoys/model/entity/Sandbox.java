@@ -1,9 +1,7 @@
 package com.smarttoys.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.util.Date;
 import lombok.Data;
 
@@ -21,9 +19,19 @@ public class Sandbox {
     private Long sandboxId;
 
     /**
+     * 沙盒名称
+     */
+    private String sandboxName;
+
+    /**
      * 沙盒类型
      */
     private String sandboxType;
+
+    /**
+     * 创建用户 id
+     */
+    private Long userId;
 
     /**
      * 创建时间
@@ -38,5 +46,6 @@ public class Sandbox {
     /**
      * 是否删除
      */
+    @TableLogic
     private Integer isDelete;
 }

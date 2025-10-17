@@ -33,7 +33,6 @@ public interface UserService extends IService<User> {
     String userRegister(UserAddRequest userAddRequest);
 
 
-
     /**
      * 获取当前登录用户
      *
@@ -50,13 +49,6 @@ public interface UserService extends IService<User> {
      */
     User getLoginUserPermitNull(HttpServletRequest request);
 
-    /**
-     * 是否为管理员
-     *
-     * @param request
-     * @return
-     */
-    boolean isAdmin(HttpServletRequest request);
 
     /**
      * 是否为管理员

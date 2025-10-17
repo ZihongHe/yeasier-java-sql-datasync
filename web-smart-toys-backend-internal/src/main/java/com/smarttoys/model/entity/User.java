@@ -1,9 +1,7 @@
 package com.smarttoys.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
@@ -51,11 +49,6 @@ public class User {
      */
     private BigDecimal userBalance;
 
-    /*
-    * 默认agentId
-     */
-    private Long defaultAgentId;
-
     /**
      * 创建时间
      */
@@ -69,5 +62,8 @@ public class User {
     /**
      * 是否删除
      */
+    @TableLogic
     private Integer isDelete;
+
+
 }
